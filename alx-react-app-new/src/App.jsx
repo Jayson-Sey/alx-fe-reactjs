@@ -1,6 +1,6 @@
 import Header from './components/Header'
-import MainContent from './components/mainContent'
 import Footer from './components/Footer'
+import MainContent from './components/mainContent'
 import UserProfile from './components/UserProfile'
 
 function App() {
