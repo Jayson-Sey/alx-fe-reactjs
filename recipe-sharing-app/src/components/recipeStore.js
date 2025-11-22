@@ -1,28 +1,33 @@
-import { create } from 'zustand'
+import { Link } from 'react-router-dom'
+import { useRecipeStore } from './recipeStore'
+import DeleteRecipeButton from './DeleteRecipeButton'
 
-export const useRecipeStore = create((set, get) => ({
-  recipes: [],
-  searchTerm: '',
-  filteredRecipes: [],
+const RecipeList = () => {
+  const recipes = useRecipeStore(state => state.recipes)
+  const searchTerm = useRecipeStore(state => state.searchTerm)
+  const filteredRecipes = useRecipeStore(state => state.filteredRecipes)
   
-  addRecipe: (newRecipe) => set((state) => ({ 
-    recipes: [...state.recipes, newRecipe] 
-  })),
-  deleteRecipe: (recipeId) => set((state) => ({
-    recipes: state.recipes.filter(recipe => recipe.id !== recipeId)
-  })),
-  updateRecipe: (recipeId, updatedRecipe) => set((state) => ({
-    recipes: state.recipes.map(recipe => 
-      recipe.id === recipeId ? { ...recipe, ...updatedRecipe } : recipe
-    )
-  })),
-  setRecipes: (recipes) => set({ recipes }),
-  
-  setSearchTerm: (term) => set({ searchTerm: term }),
-  filterRecipes: () => set((state) => ({
-    filteredRecipes: state.recipes.filter(recipe =>
-      recipe.title.toLowerCase().includes(state.searchTerm.toLowerCase()) ||
-      recipe.description.toLowerCase().includes(state.searchTerm.toLowerCase())
-    )
-  }))
-}))
+  // Use filtered recipes if there's a search term, otherwise use all recipes
+  const displayRecipes = searchTerm ? filteredRecipes : recipes
+
+  return (
+    <div>
+      <h2>Recipes</h2>
+      {displayRecipes.map(recipe => (
+        <div key={recipe.id}>
+          <Link to={`/recipe/${recipe.id}`}>
+            <h3>{recipe.title}</h3>
+          </Link>
+          <p>{recipe.description}</p>
+          <Link to={`/recipe/${recipe.id}/edit`}>Edit</Link>
+          <DeleteRecipeButton recipeId={recipe.id} />
+        </div>
+      ))}
+      {searchTerm && displayRecipes.length === 0 && (
+        <p>No recipes found matching "{searchTerm}"</p>
+      )}
+    </div>
+  )
+}
+
+export default RecipeList
